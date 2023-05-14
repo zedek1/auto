@@ -1,2 +1,7 @@
 # tool-kit
-making life easier
+*making life easier*
+
+add this to .bashrc or .zshrc
+```bash
+export PATH=$PATH:~/auto
+```
