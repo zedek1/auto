@@ -5,7 +5,15 @@ lhost=""
 lport=4444
 
 usage() {
-    echo "Usage: $0 [-c compile] [-s don't start http server] [-i <lhost>] [-p <lport>]" 1>&2;
+    echo "Usage:" 
+    echo "-c    -> compile binaries and list"
+    echo "-d    -> only compile binaries"
+    echo "-g    -> generate powershell one liners"
+    echo "-s    -> don't start python http server"
+    echo "-h    -> help menu"
+    echo ""
+    echo "-i [ip]    -> manually set LHOST"
+    echo "-p [port]  -> manually set LPORT"
     exit 1;
 }
 
