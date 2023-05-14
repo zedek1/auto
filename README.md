@@ -20,7 +20,7 @@ options
 -s    -> don't start python http server
 -h    -> help menu
 
--i    -> manually set LHOST
--p    -> manually set LPORT
+-i [ip]    -> manually set LHOST
+-p [port]  -> manually set LPORT
 ```
 
