@@ -1,8 +1,8 @@
 #include <winsock2.h>
 #include <stdio.h>
 
-#define SERVER_IP "192.168.0.30"
-#define SERVER_PORT 443
+#define SERVER_IP "10.8.91.46"
+#define SERVER_PORT 5555
 
 int main(int argc, char *argv[])
 {

