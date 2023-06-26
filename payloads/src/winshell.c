@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #define SERVER_IP "10.8.91.46"
-#define SERVER_PORT 1337
+#define SERVER_PORT 4444
 
 int main(int argc, char *argv[])
 {

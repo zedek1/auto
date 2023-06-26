@@ -14,8 +14,9 @@ export PATH=$PATH:~/auto
 
 options
 ```
--c    -> compile binaries and list
--d    -> only compile binaries
+-c    -> compile basic binaries
+-m    -> compile meterpreter binaries
+-d    -> compile all binaries but don't list
 -g    -> generate powershell one liners
 -s    -> don't start python http server
 -h    -> help menu

