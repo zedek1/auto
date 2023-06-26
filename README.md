@@ -17,6 +17,7 @@ options
 -c    -> compile basic binaries
 -m    -> compile meterpreter binaries
 -d    -> compile all binaries but don't list
+-w    -> setup webshells and don't list
 -g    -> generate powershell one liners
 -s    -> don't start python http server
 -h    -> help menu
