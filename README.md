@@ -1,15 +1,16 @@
 # tool-kit
 *making life easier*
 
+1 place the folder in your users home directory named "auto"
 
-first make autogen executable
+2 make autogen executable
 ```bash
 chmod +x autogen
 ```
 
-then add it to .bashrc or .zshrc
+3 add it to .bashrc or .zshrc
 ```bash
-alias autogen="/[LOCATION]/autogen"
+alias autogen="/home/$USER/auto/autogen"
 ```
 
 usage
