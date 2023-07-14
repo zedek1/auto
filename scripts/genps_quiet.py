@@ -1,3 +1,5 @@
+# quiet version of genps.py
+
 import sys
 import base64
 

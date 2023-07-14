@@ -4,15 +4,15 @@
 
 first make autogen executable
 ```bash
-chmod 777 autogen
+chmod +x autogen
 ```
 
-then add the path to .bashrc or .zshrc
+then add it to .bashrc or .zshrc
 ```bash
-export PATH=$PATH:~/auto
+alias autogen="/[LOCATION]/autogen"
 ```
 
-options
+usage
 ```
 -c    -> compile basic binaries
 -m    -> compile meterpreter binaries

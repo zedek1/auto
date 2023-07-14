@@ -1,3 +1,5 @@
+# stand alone script to generate powershell base64 encoded reverse shells
+
 import sys
 import base64
 import subprocess
