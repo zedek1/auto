@@ -1,3 +1,5 @@
+# just testing out pwsh on linux - feel free to replace this in autogen list_stuff()
+
 $lhost=$args[0] # "127.0.0.1"
 $lport=$args[1] # 4444
 

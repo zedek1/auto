@@ -1,3 +1,5 @@
+# this only works for outdated versions of OpenSSH
+
 import argparse
 import logging
 import paramiko
