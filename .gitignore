@@ -5,9 +5,6 @@ mettcp.exe
 rs_service.exe
 cppdll_shell.dll
 
-*.c
-*.php
-
 # wordpress plugin reverse shells
 wpshell*
 
