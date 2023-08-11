@@ -4,7 +4,7 @@
 Stop wasting time compiling, typing, and finding payloads
 
 ### Features
-1. Automatically detects interface for compiling and delivering payloads. default port is 4444 (chanage at top of script)
+1. Automatically detects interface for compiling and delivering payloads. default port is 4444 (chanage in script)
 2. Edits and/or compiles web shells, msfvenom meterpreter commands, and custom shell payloads
 3. Generates one-liners including base64-encoded powershell reverse shells and url-encoded shells
 4. Comes with a variety of tools for Active Directory, Pivoting, Windows & Linux privilege escalation
