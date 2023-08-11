@@ -1,8 +1,0 @@
-tools that are quick as fuck
-
-
-rustscan      -> version 2.1.1 in this directory  (fast nmap)      [sudo rustscan <ip> -- -A]
-feroxbuster   -> sudo apt install feroxbuster     (fast gobuster)  [feroxbuster -u http://<ip>]
-
-
-though it's probably best to only use these when playing a CTF
