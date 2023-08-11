@@ -68,12 +68,12 @@ usage: autogen <options>
 
 **output -r**
 
-![image](https://github.com/zedek1/autogen/assets/45067032/42e0e494-bf53-4036-bf70-2f75adf70246)
+![image](https://github.com/zedek1/autogen/assets/45067032/b117e27e-7711-4fc2-992c-f442aa5a5071)
 
 
 **output -d**
 
-![image](https://github.com/zedek1/autogen/assets/45067032/12f455c6-d7a2-4980-ab08-4175a67cb7b0)
+![image](https://github.com/zedek1/autogen/assets/45067032/3f205d34-1a7c-44ed-9d86-bf214a14d227)
 
 
 **output -l**
