@@ -68,15 +68,18 @@ usage: autogen <options>
 
 **output -r**
 
-![image](https://github.com/zedek1/auto/assets/45067032/1affc255-e7c5-43f8-8566-c6daa60bdb40)
+![image](https://github.com/zedek1/autogen/assets/45067032/42e0e494-bf53-4036-bf70-2f75adf70246)
+
 
 **output -d**
 
-![image](https://github.com/zedek1/auto/assets/45067032/ec0d99ff-ca65-4eb3-a9d9-b950f282a388)
+![image](https://github.com/zedek1/autogen/assets/45067032/12f455c6-d7a2-4980-ab08-4175a67cb7b0)
+
 
 **output -l**
 
-![image](https://github.com/zedek1/auto/assets/45067032/2bb68255-63e0-4ed6-95c7-4d1935a6046d)
+![image](https://github.com/zedek1/autogen/assets/45067032/358c6305-da1a-4bae-82d0-1b2e25c8ab1f)
+
 
 ### Full -l List
 ```text
