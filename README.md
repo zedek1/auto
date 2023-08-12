@@ -27,19 +27,14 @@ Stop wasting time compiling, typing, and finding payloads
 3. linmettcp.elf
 
 ### Installation
-1. put the folder in your users home directory and make sure it's named "auto"
+1. download and make the "autogen" shell script executable
 ```bash
-cd ~
-git clone https://github.com/zedek1/auto.git
+git clone https://github.com/zedek1/autogen.git
+chmod +x autogen/autogen
 ```
-2. make the "autogen" shell script executable
+2. add autogen to .bashrc or .zshrc
 ```bash
-cd auto
-chmod +x autogen
-```
-3. add autogen to .bashrc or .zshrc
-```bash
-alias autogen="/home/$USER/auto/autogen"
+alias autogen="path/to/autogen/autogen"
 ```
 
 ### Usage
